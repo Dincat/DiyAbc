@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>编辑网页模板</title>
+    <script>
+        function replaceKeyWord(kw, href) {
+            var c = document.getElementById("txtBody").innerHTML;
+            //var reg=/九寨沟(?!([^<]*>)|([^<]*<\/a>))/ig;
+            var json = [
+                { 'key': kw, 'url': href }
+                //, { 'key': '景点', 'url': '/景点/' }
+                //, { 'key': '景区', 'url': '/景区/' }
+            ];
+            var reg;
+            for (var i = 0; i < json.length; i++) {
+                var j = json[i];
+                reg = new RegExp(j.key + "(?!([^<]*>)|([^<]*<\/a>))", "ig");
+                c = c.replace(reg, "<a href='" + j.url + "'><span style=\"color:#fe3434! important;\">" + j.key + "</span></a>");
+            }
+            document.getElementById("txtBody").innerHTML = c;
+        }
+        function createLink(href, sText) {
+            var sText = document.getSelection();
+            document.execCommand('insertHTML', false, '<a href="' + href + '" target="_blank">' + sText + '</a>');
+        }
+        function getText() {
+            return document.getElementById("txtBody").innerText;
+        }
+        function getT() {
+            return document.getElementById("txtBody").innerHTML;
+        }
+        function setT(txt) {
+            document.getElementById("txtBody").innerHTML = txt;
+        }
+        function setT2() {
+            document.getElementById("txtBody").innerHTML = mycmds.GetHtmlBody();
+        }
+        function insertHtml(html) {
+            //mylog.log("iiii:" + html);
+            document.execCommand('insertHTML', false, html);
+        }
+        function inserttest(html) {
+            var doc = document;
+
+            // IE <= 10
+            if (document.selection) {
+                var range = doc.selection.createRange();
+                range.pasteHTML(html);
+
+                // IE 11 && Firefox, Opera .....
+            } else if (document.getSelection) {
+                var range = doc.getSelection().getRangeAt(0);
+                var nnode = doc.createElement("b");
+                range.surroundContents(nnode);
+                nnode.innerHTML = html;
+            };
+        }
+        function insert222() {
+            var r = getSelection().getRangeAt(0);
+            r.insertNode(r.createContextualFragment('<b>Hello</b>'));
+
+            //select this range
+            getSelection().removeAllRanges();
+            getSelection().addRange(r);
+            //collapse to end/start 
+            getSelection().collapseToEnd() 
+        }
+        function insertHtmlAtCaret(html) {
+            var sel, range;
+            if (window.getSelection) {
+                mylog.log("ddddddd");
+                // IE9 and non-IE
+                sel = window.getSelection();
+                if (sel.getRangeAt && sel.rangeCount) {
+                    range = sel.getRangeAt(0);
+                    range.deleteContents();
+                    // Range.createContextualFragment() would be useful here but is
+                    // non-standard and not supported in all browsers (IE9, for one)
+                    var el = document.createElement("div");
+                    el.innerHTML = html;
+                    var frag = document.createDocumentFragment(), node, lastNode;
+                    while ((node = el.firstChild)) {
+                        lastNode = frag.appendChild(node);
+                    }
+                    range.insertNode(frag);
+                    // Preserve the selection
+                    if (lastNode) {
+                        range = range.cloneRange();
+                        range.setStartAfter(lastNode);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                }
+            } else if (document.selection && document.selection.type != "Control") {
+                // IE < 9
+                mylog.log("222"+html);
+                document.selection.createRange().pasteHTML(html);
+            }
+        }
+        //$('.js_content').focus();//要插入内容的div
+        //insertHtmlAtCaret(content)
+        document.designMode = true;
+    </script>
+</head>
+<body id="txtBody" contentEditable="true">
+    这里填写html内容
+    <span style="color:blue;font-weight:bold;"></span>
+</body>
+</html>

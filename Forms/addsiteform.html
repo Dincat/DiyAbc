@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>添加行业网站</title>
+</head>
+<body>
+    ssss 			IDataObject iData = Clipboard.GetDataObject();
+    if (iData.GetDataPresent(DataFormats.MetafilePict))
+    {
+    var img = Clipboard.GetImage();
+    picBox.Tag = Guid.NewGuid();
+    picBox.Image = img;
+    }
+    else if (iData.GetDataPresent(DataFormats.FileDrop))
+    {
+    var files = Clipboard.GetFileDropList();
+    if (files.Count == 0) { return; }
+    picBox.Tag = Guid.NewGuid();
+    picBox.Image = Image.FromFile(files[0]);
+    }
+
+    else if (iData.GetDataPresent(DataFormats.Text))
+    {
+    var path = (String)iData.GetData(DataFormats.Text);
+    var chars = Path.GetInvalidPathChars();
+    if (path.IndexOfAny(chars)>=0) {
+    F.error("路径中包含非法字符！");
+    return;
+    }
+    if (System.IO.File.Exists(path))
+    {
+    var name = Path.GetFileNameWithoutExtension(path);
+    var extension = path.Substring(path.LastIndexOf("."));
+    string imgType = ".png|.jpg|.jpeg";
+    if (imgType.Contains(extension.ToLower()))
+    {
+    picBox.Image = Image.FromFile(path);
+    picBox.Tag = Guid.NewGuid();
+    IsChanged = true;
+    }
+    else {
+    F.error("格式错误！");
+    }
+
+    }
+    else {
+    F.error("文件不存在！");
+    }
+    }
+
+
+
+
+</body>
+</html>
